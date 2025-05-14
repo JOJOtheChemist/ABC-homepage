@@ -39,6 +39,38 @@ async function loadComponent(elementId, componentPath) {
     }
 }
 
+// 加载图片feed组件
+async function loadImageFeed(containerId) {
+    try {
+        const response = await fetch('widget/image-feed.html');
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        const html = await response.text();
+        document.getElementById(containerId).innerHTML = html;
+    } catch (error) {
+        console.error('Error loading image feed:', error);
+    }
+}
+
+// 加载feed卡片组件
+async function loadFeedCard(containerId, title, content, likes, comments, bookmarks) {
+    try {
+        const response = await fetch('widget/feed-card.html');
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        let html = await response.text();
+        
+        // 替换内容
+        html = html.replace('推文标题示例', title)
+                  .replace('这里是推文的正文内容摘要，可以展示多行内容，长度适中更美观。', content)
+                  .replace('443', likes)
+                  .replace('12', comments)
+                  .replace('45', bookmarks);
+        
+        document.getElementById(containerId).innerHTML = html;
+    } catch (error) {
+        console.error('Error loading feed card:', error);
+    }
+}
+
 // 加载所有组件
 async function loadAllComponents() {
     // 获取绝对路径
@@ -105,6 +137,12 @@ async function loadAllComponents() {
             placeholder.innerHTML = `<div class="error">Failed to load video row: ${error.message}</div>`;
         }
     }
+    
+    // 加载图片feed
+    await loadImageFeed('imgFeed');
+    
+    // 加载feed卡片
+    await loadFeedCard('textFeed', '推文标题示例1', '这里是推文的正文内容摘要，可以展示多行内容，长度适中更美观。', '443', '12', '45');
     
     // 设置事件监听器
     setTimeout(() => {
