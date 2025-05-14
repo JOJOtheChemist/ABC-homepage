@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>时间管理社群App新布局</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; background: #f7f7f7; }
+        .container { max-width: 430px; margin: 0 auto; background: #fff; min-height: 100vh; }
+        .theme-tabs { display: flex; overflow-x: auto; background: #fff; border-bottom: 1px solid #eee; }
+        .theme-tab { flex: 0 0 auto; padding: 12px 18px; font-weight: bold; color: #555; cursor: pointer; }
+        .theme-tab.active { color: #fff; background: #4a90e2; border-radius: 20px; }
+        .carousel { margin: 10px 0; padding: 0 10px; position: relative; height: 56px; }
+        .carousel-slide {
+            background: #e0f0ff; border-radius: 10px; padding: 18px;
+            text-align: center; font-weight: bold; position: absolute; left: 0; right: 0; top: 0;
+            opacity: 0; transition: opacity 0.5s;
+        }
+        .carousel-slide.active { opacity: 1; z-index: 1; }
+        .feature-icons { display: flex; justify-content: space-around; margin: 18px 0; }
+        .feature-icon { width: 56px; height: 56px; border-radius: 50%; background: #f0f0f0; display: flex; align-items: center; justify-content: center; font-size: 24px; flex-direction: column; }
+        .feature-label { font-size: 12px; margin-top: 4px; color: #666; }
+        .video-row { display: flex; align-items: center; overflow-x: auto; padding: 10px 0; }
+        .video-card { min-width: 140px; height: 105px; background: #eee; border-radius: 8px; margin-right: 10px; display: flex; align-items: flex-end; justify-content: center; position: relative; }
+        .video-title { font-size: 13px; color: #333; background: rgba(255,255,255,0.8); width: 100%; text-align: center; border-radius: 0 0 8px 8px; }
+        .more-arrow { font-size: 20px; color: #aaa; margin-left: 8px; cursor: pointer; }
+        .mode-switch-bar { display: flex; justify-content: flex-end; align-items: center; padding: 8px 12px; }
+        .mode-btn { background: #eee; border: none; border-radius: 16px; padding: 6px 16px; margin-left: 8px; cursor: pointer; }
+        .mode-btn.active { background: #4a90e2; color: #fff; }
+        .feed { padding: 0 10px; }
+        .feed-list { display: flex; flex-direction: column; gap: 16px; }
+        .feed-card { background: #fafafa; border-radius: 10px; padding: 18px 14px 12px 14px; box-shadow: 0 2px 8px rgba(0,0,0,0.03); margin-bottom: 8px; }
+        .feed-card-title { font-size: 17px; font-weight: bold; color: #222; margin-bottom: 8px; }
+        .feed-card-body { font-size: 15px; color: #444; margin-bottom: 10px; }
+        .feed-card-img { width: 100%; height: 180px; background: #e0e0e0; border-radius: 8px; margin-bottom: 10px; object-fit: cover; }
+        .feed-card-actions { display: flex; align-items: center; gap: 24px; margin-top: 6px; color: #888; font-size: 18px; }
+        .feed-card-action { display: flex; align-items: center; gap: 4px; cursor: pointer; font-size: 16px; }
+        .feed-card-action span { font-size: 15px; color: #666; }
+        .recommend-section { margin: 24px 0; padding: 0 10px; }
+        .recommend-title { font-weight: bold; margin-bottom: 10px; }
+        .recommend-list { display: flex; flex-direction: column; gap: 12px; }
+        .recommend-card { display: flex; align-items: center; background: #f5faff; border-radius: 8px; padding: 10px; }
+        .recommend-avatar { width: 40px; height: 40px; border-radius: 50%; background: #ddd; margin-right: 10px; }
+        .recommend-info { flex: 1; }
+        .recommend-btn { background: #4a90e2; color: #fff; border: none; border-radius: 16px; padding: 6px 16px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 主题切换 -->
+        <div class="theme-tabs">
+            <div class="theme-tab active">推荐</div>
+            <div class="theme-tab">学习方法</div>
+            <div class="theme-tab">情绪健康</div>
+            <div class="theme-tab">兴趣爱好</div>
+            <div class="theme-tab">副业成长</div>
+        </div>
+
+        <!-- 轮播图/话题横幅 -->
+        <div class="carousel" id="carousel">
+            <div class="carousel-slide active">督学直播：230人正在早起学习</div>
+            <div class="carousel-slide">400人在讨论学习方法</div>
+            <div class="carousel-slide">500人在关注情绪健康</div>
+            <div class="carousel-slide">100人在发展副业</div>
+        </div>
+
+        <!-- 四大功能按钮 -->
+        <div class="feature-icons">
+            <div class="feature-icon">
+                📊
+                <div class="feature-label">统计</div>
+            </div>
+            <div class="feature-icon">
+                ➕
+                <div class="feature-label">发动态</div>
+            </div>
+            <div class="feature-icon">
+                ⏲️
+                <div class="feature-label">番茄钟</div>
+            </div>
+            <div class="feature-icon">
+                📝
+                <div class="feature-label">时间表</div>
+            </div>
+        </div>
+
+        <!-- 横向视频卡片区 -->
+        <div style="display: flex; align-items: center; padding: 0 10px;">
+            <div class="video-row" style="flex:1;">
+                <div class="video-card"><div class="video-title">视频1标题</div></div>
+                <div class="video-card"><div class="video-title">视频2标题</div></div>
+                <div class="video-card"><div class="video-title">视频3标题</div></div>
+            </div>
+            <div class="more-arrow">›</div>
+        </div>
+
+        <!-- 图文流模式切换 -->
+        <div class="mode-switch-bar">
+            <span>切换：</span>
+            <button class="mode-btn active" id="textModeBtn">文字模式</button>
+            <button class="mode-btn" id="imgModeBtn">图片模式</button>
+        </div>
+
+        <!-- 图文流（文字模式） -->
+        <div class="feed" id="textFeed">
+            <div class="feed-list">
+                <div class="feed-card">
+                    <div class="feed-card-title">推文标题示例1</div>
+                    <div class="feed-card-body">这里是推文的正文内容摘要，可以展示多行内容，长度适中更美观。</div>
+                    <div class="feed-card-img"></div>
+                    <div class="feed-card-actions">
+                        <div class="feed-card-action">❤️ <span>443</span></div>
+                        <div class="feed-card-action">💬 <span>12</span></div>
+                        <div class="feed-card-action">🔖 <span>45</span></div>
+                        <div class="feed-card-action">🔄</div>
+                    </div>
+                </div>
+                <div class="feed-card">
+                    <div class="feed-card-title">推文标题示例2</div>
+                    <div class="feed-card-body">这里是另一条推文的正文内容摘要，支持换行和更多内容展示。</div>
+                    <div class="feed-card-img"></div>
+                    <div class="feed-card-actions">
+                        <div class="feed-card-action">❤️ <span>321</span></div>
+                        <div class="feed-card-action">💬 <span>8</span></div>
+                        <div class="feed-card-action">🔖 <span>22</span></div>
+                        <div class="feed-card-action">🔄</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 图文流（图片模式，默认隐藏，切换后显示） -->
+        <div class="feed" id="imgFeed" style="display:none;">
+            <div class="feed-card-imgmode">
+                <div class="feed-img-col">
+                    <div class="feed-img"></div>
+                    <div class="feed-img"></div>
+                </div>
+                <div class="feed-img-col">
+                    <div class="feed-img"></div>
+                    <div class="feed-img"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 推荐关注区 -->
+        <div class="recommend-section">
+            <div class="recommend-title">推荐关注</div>
+            <div class="recommend-list">
+                <div class="recommend-card">
+                    <div class="recommend-avatar"></div>
+                    <div class="recommend-info">
+                        <div style="font-weight:bold;">用户ID1</div>
+                        <div style="font-size:13px; color:#666;">时间管理达人，专注高效学习</div>
+                    </div>
+                    <button class="recommend-btn">关注</button>
+                </div>
+                <div class="recommend-card">
+                    <div class="recommend-avatar"></div>
+                    <div class="recommend-info">
+                        <div style="font-weight:bold;">用户ID2</div>
+                        <div style="font-size:13px; color:#666;">自律生活记录者</div>
+                    </div>
+                    <button class="recommend-btn">关注</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        // 轮播图自动切换
+        const slides = document.querySelectorAll('.carousel-slide');
+        let current = 0;
+        setInterval(() => {
+            slides[current].classList.remove('active');
+            current = (current + 1) % slides.length;
+            slides[current].classList.add('active');
+        }, 2500);
+
+        // 图文流模式切换
+        const textBtn = document.getElementById('textModeBtn');
+        const imgBtn = document.getElementById('imgModeBtn');
+        const textFeed = document.getElementById('textFeed');
+        const imgFeed = document.getElementById('imgFeed');
+        textBtn.onclick = function() {
+            textBtn.classList.add('active');
+            imgBtn.classList.remove('active');
+            textFeed.style.display = '';
+            imgFeed.style.display = 'none';
+        }
+        imgBtn.onclick = function() {
+            imgBtn.classList.add('active');
+            textBtn.classList.remove('active');
+            textFeed.style.display = 'none';
+            imgFeed.style.display = '';
+        }
+    </script>
+</body>
+</html> 

@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>时间管理社群App布局（可交互）</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #f5f5f5;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 414px; /* iPhone 12/13 Pro Max 宽度 */
+            min-height: 100vh;
+            margin: 0 auto;
+            background: white;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            position: relative;
+        }
+        
+        /* ===== 页面结构 ===== */
+        .app-header {
+            background: #fff;
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .fixed-top-area {
+            background: #f0f7ff;
+            padding: 10px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .content-area {
+            min-height: calc(100vh - 200px);
+            position: relative;
+        }
+        
+        .content-tabs {
+            display: flex;
+            border-bottom: 1px solid #eee;
+            background: #fff;
+            position: sticky;
+            top: 55px;
+            z-index: 10;
+        }
+        
+        .tab {
+            flex: 1;
+            text-align: center;
+            padding: 12px;
+            border-bottom: 2px solid transparent;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .tab.active {
+            border-bottom: 2px solid #4a90e2;
+            font-weight: bold;
+            color: #4a90e2;
+        }
+        
+        .content-stream {
+            padding: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .app-footer {
+            background: #fff;
+            border-top: 1px solid #eee;
+            padding: 10px;
+            position: sticky;
+            bottom: 0;
+            z-index: 100;
+        }
+        
+        /* ===== 组件样式 ===== */
+        .live-banner {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(to right, #4a90e2, #63b3ed);
+            color: white;
+            padding: 12px;
+            border-radius: 8px;
+        }
+        
+        .quick-actions {
+            display: flex;
+            padding: 10px 0;
+            justify-content: space-between;
+        }
+        
+        .action-button {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin: 0 5px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .action-button:hover {
+            transform: scale(1.05);
+        }
+        
+        .plus-button {
+            background: linear-gradient(45deg, #ff6b6b, #ff8e8e);
+            color: white;
+        }
+        
+        .content-card {
+            background: #fff;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .time-block {
+            background: #ebf5ff;
+            padding: 8px 12px;
+            font-weight: bold;
+            color: #4a90e2;
+            border-left: 3px solid #4a90e2;
+            margin-bottom: 8px;
+        }
+        
+        .card-content {
+            padding: 12px;
+        }
+        
+        .image-container {
+            height: 180px;
+            background: #eee;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .interaction-bar {
+            display: flex;
+            padding: 8px 12px;
+            border-top: 1px solid #f5f5f5;
+        }
+        
+        .video-card {
+            position: relative;
+            height: 320px;
+            background: #000;
+            border-radius: 8px;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            margin-bottom: 16px;
+        }
+        
+        .video-content {
+            padding: 16px;
+            background: linear-gradient(transparent, rgba(0,0,0,0.7));
+        }
+        
+        .nav-tabs {
+            display: flex;
+            justify-content: space-around;
+        }
+        
+        .nav-tab {
+            text-align: center;
+            font-size: 12px;
+            cursor: pointer;
+        }
+        
+        .icon-placeholder {
+            width: 24px;
+            height: 24px;
+            background: #eee;
+            border-radius: 50%;
+            margin: 0 auto 4px;
+        }
+        
+        /* 装饰 */
+        .comment-preview {
+            background: #f9f9f9;
+            border-radius: 4px;
+            padding: 8px;
+            margin-top: 8px;
+            font-size: 14px;
+        }
+        
+        /* 灵感模式特有样式 */
+        .video-container {
+            position: relative;
+            height: calc(100vh - 170px);
+            overflow: hidden;
+            margin: -10px;
+        }
+        
+        .video-fullscreen {
+            height: 100%;
+            width: 100%;
+            object-fit: cover;
+            background: #000;
+            position: relative;
+        }
+        
+        .video-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 20px;
+            background: linear-gradient(transparent, rgba(0,0,0,0.8));
+            color: white;
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+        
+        /* 模式切换动画 */
+        .fade-enter {
+            opacity: 0;
+        }
+        
+        .fade-enter-active {
+            opacity: 1;
+            transition: opacity 0.3s;
+        }
+        
+        .fade-exit {
+            opacity: 1;
+        }
+        
+        .fade-exit-active {
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 应用顶部 -->
+        <header class="app-header">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div style="font-weight: bold; font-size: 18px;">时间管理社群</div>
+                <div>
+                    <span style="margin-right: 15px;">🔍</span>
+                    <span>📩</span>
+                </div>
+            </div>
+        </header>
+        
+        <!-- 第一层：顶部固定功能区 -->
+        <section class="fixed-top-area">
+            <!-- 督学直播入口 -->
+            <div class="live-banner">
+                <div>
+                    <div style="font-weight: bold">📺 督学直播</div>
+                    <div style="font-size: 12px; margin-top: 4px;">230人正在早起学习</div>
+                </div>
+                <button style="background: white; color: #4a90e2; border: none; padding: 6px 12px; border-radius: 4px; font-weight: bold; cursor: pointer;">进入直播</button>
+            </div>
+            
+            <!-- 快速记录按钮 -->
+            <div class="quick-actions">
+                <div class="action-button">📊</div>
+                <div class="action-button plus-button">+</div>
+                <div class="action-button">⏱️</div>
+            </div>
+        </section>
+        
+        <!-- 第二/三层：分栏切换+内容区域 -->
+        <section class="content-area">
+            <!-- 内容模式切换 -->
+            <div class="content-tabs">
+                <div id="study-tab" class="tab active">学习模式</div>
+                <div id="inspire-tab" class="tab">灵感模式</div>
+            </div>
+            
+            <!-- 算法推荐流：学习模式（默认） -->
+            <div id="study-mode" class="content-stream">
+                <!-- 模式提示 -->
+                <div style="text-align: center; padding: 10px; margin-bottom: 15px; color: #4a90e2; font-weight: bold; background: #f8f8f8; border-radius: 8px;">
+                    图文学习模式 - 专注深度内容
+                </div>
+                
+                <!-- 图文内容卡片（Twitter风格） -->
+                <div class="content-card">
+                    <div class="time-block">
+                        6:00-7:00 背单词打卡 ✓
+                    </div>
+                    <div class="card-content">
+                        <div style="font-weight: bold;">今日方法：A4纸记忆法</div>
+                        <p>通过四个象限划分记忆目标，提高效率...(点击展开图解👇)</p>
+                        <div class="image-container">图片内容</div>
+                        <div class="comment-preview">
+                            <strong>张三：</strong>这个方法我用了一周，单词记忆效果翻倍！
+                        </div>
+                    </div>
+                    <div class="interaction-bar">
+                        <div style="margin-right: 16px;">👍 1.2k</div>
+                        <div style="margin-right: 16px;">💬 45</div>
+                        <div>🔖</div>
+                    </div>
+                </div>
+                
+                <!-- 短视频预览卡片（融合式设计） -->
+                <div class="content-card">
+                    <div class="time-block">
+                        12:00-12:30 午休冥想 ✓
+                    </div>
+                    <div class="card-content">
+                        <div style="font-weight: bold;">5分钟高效放松法</div>
+                        <p>午休时间短？试试这个方法快速恢复精力👇</p>
+                        <div class="image-container" style="position: relative;">
+                            <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
+                                <div style="width: 50px; height: 50px; background: rgba(255,255,255,0.3); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                                    ▶️
+                                </div>
+                            </div>
+                            <div style="position: absolute; bottom: 10px; right: 10px; background: rgba(0,0,0,0.5); color: white; padding: 3px 6px; border-radius: 4px; font-size: 12px;">
+                                03:25
+                            </div>
+                            视频缩略图
+                        </div>
+                    </div>
+                    <div class="interaction-bar">
+                        <div style="margin-right: 16px;">👍 834</div>
+                        <div style="margin-right: 16px;">💬 29</div>
+                        <div>🔖</div>
+                    </div>
+                </div>
+                
+                <!-- 长文内容卡片 -->
+                <div class="content-card">
+                    <div class="time-block">
+                        20:00-21:30 深度阅读 ✓
+                    </div>
+                    <div class="card-content">
+                        <div style="font-weight: bold;">《深度工作》读书笔记分享</div>
+                        <p>这本书改变了我的工作方式，特别是关于如何构建深度工作的仪式感这一章...(展开阅读)</p>
+                    </div>
+                    <div class="interaction-bar">
+                        <div style="margin-right: 16px;">👍 456</div>
+                        <div style="margin-right: 16px;">💬 78</div>
+                        <div>🔖</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 灵感模式（隐藏状态，需点击切换） -->
+            <div id="inspire-mode" class="content-stream hidden">
+                <!-- 模式提示 -->
+                <div style="text-align: center; padding: 10px; margin-bottom: 15px; color: #ff6b6b; font-weight: bold; background: #f8f8f8; border-radius: 8px;">
+                    灵感视频模式 - 快速获取创意
+                </div>
+                
+                <!-- 全屏短视频（抖音风格） -->
+                <div class="video-container">
+                    <div class="video-fullscreen" style="background-image: url('https://via.placeholder.com/414x600/333/fff?text=视频内容'); background-size: cover;">
+                        <div class="video-overlay">
+                            <h3>3步搞定拖延症</h3>
+                            <p>专注力教练王老师分享：如何快速进入工作状态 #时间管理 #拖延</p>
+                            <div style="display: flex; justify-content: space-between; margin-top: 20px;">
+                                <div style="text-align: center">
+                                    <div style="width: 40px; height: 40px; background: rgba(255,255,255,0.2); border-radius: 50%; margin: 0 auto 8px; display: flex; align-items: center; justify-content: center;">👍</div>
+                                    <div>2.3k</div>
+                                </div>
+                                <div style="text-align: center">
+                                    <div style="width: 40px; height: 40px; background: rgba(255,255,255,0.2); border-radius: 50%; margin: 0 auto 8px; display: flex; align-items: center; justify-content: center;">💬</div>
+                                    <div>120</div>
+                                </div>
+                                <div style="text-align: center">
+                                    <div style="width: 40px; height: 40px; background: rgba(255,255,255,0.2); border-radius: 50%; margin: 0 auto 8px; display: flex; align-items: center; justify-content: center;">🔄</div>
+                                    <div>转发</div>
+                                </div>
+                                <div style="text-align: center">
+                                    <div style="width: 40px; height: 40px; background: rgba(255,255,255,0.2); border-radius: 50%; margin: 0 auto 8px; display: flex; align-items: center; justify-content: center;">🔖</div>
+                                    <div>收藏</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 底部滑动提示 -->
+                <div style="text-align: center; margin-top: 10px; color: #999; font-size: 12px;">
+                    ↑ 上滑查看下一个视频 ↑
+                </div>
+            </div>
+        </section>
+        
+        <!-- 第四层：底部常驻tab -->
+        <footer class="app-footer">
+            <div class="nav-tabs">
+                <div class="nav-tab">
+                    <div class="icon-placeholder" style="background: #4a90e2;"></div>
+                    <div>首页</div>
+                </div>
+                <div class="nav-tab">
+                    <div class="icon-placeholder"></div>
+                    <div>今日话题</div>
+                </div>
+                <div class="nav-tab">
+                    <div class="icon-placeholder"></div>
+                    <div>挑战赛</div>
+                </div>
+                <div class="nav-tab">
+                    <div class="icon-placeholder"></div>
+                    <div>时间块</div>
+                </div>
+                <div class="nav-tab">
+                    <div class="icon-placeholder"></div>
+                    <div>我的</div>
+                </div>
+            </div>
+        </footer>
+    </div>
+    
+    <!-- 布局说明 -->
+    <div style="max-width: 414px; margin: 20px auto; padding: 15px; background: #f9f9f9; border-radius: 8px;">
+        <h3>页面布局说明：</h3>
+        <ol>
+            <li><strong>顶部固定功能区</strong>：
+                <ul>
+                    <li>督学直播入口：显示当前直播状态和人数</li>
+                    <li>快速记录按钮：中间的"+"按钮用于快速发布内容</li>
+                </ul>
+            </li>
+            <li><strong>分栏切换</strong>：
+                <ul>
+                    <li>学习模式：默认模式，以时间块内容为主，深度学习内容</li>
+                    <li>灵感模式：切换到短视频流，快速获取创意和灵感</li>
+                </ul>
+            </li>
+            <li><strong>算法推荐流</strong>：
+                <ul>
+                    <li>学习模式：图文内容卡片+短视频预览+长文分享</li>
+                    <li>灵感模式：全屏短视频，类似抖音的浏览体验</li>
+                </ul>
+            </li>
+            <li><strong>底部常驻tab</strong>：
+                <ul>
+                    <li>五个主要功能入口：首页、今日话题、挑战赛、时间块和个人中心</li>
+                </ul>
+            </li>
+        </ol>
+        
+        <h3>交互说明：</h3>
+        <ul>
+            <li><strong>可实际点击【学习模式/灵感模式】切换两种展示形式</strong></li>
+            <li>双击内容可快速点赞（类似IG）</li>
+            <li>长按可收藏到时间块</li>
+            <li>点击时间块标签可查看相同时间段的其他用户分享</li>
+        </ul>
+    </div>
+    
+    <script>
+        // 模式切换功能
+        document.addEventListener('DOMContentLoaded', function() {
+            // 获取元素
+            const studyTab = document.getElementById('study-tab');
+            const inspireTab = document.getElementById('inspire-tab');
+            const studyMode = document.getElementById('study-mode');
+            const inspireMode = document.getElementById('inspire-mode');
+            
+            // 切换到学习模式
+            studyTab.addEventListener('click', function() {
+                // 激活学习模式标签
+                studyTab.classList.add('active');
+                inspireTab.classList.remove('active');
+                
+                // 显示学习模式内容
+                studyMode.classList.remove('hidden');
+                inspireMode.classList.add('hidden');
+            });
+            
+            // 切换到灵感模式
+            inspireTab.addEventListener('click', function() {
+                // 激活灵感模式标签
+                inspireTab.classList.add('active');
+                studyTab.classList.remove('active');
+                
+                // 显示灵感模式内容
+                inspireMode.classList.remove('hidden');
+                studyMode.classList.add('hidden');
+            });
+        });
+    </script>
+</body>
+</html> 

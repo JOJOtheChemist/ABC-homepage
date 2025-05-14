@@ -1,0 +1,52 @@
+<!-- 四大功能按钮 -->
+<div class="feature-icons">
+    <div class="feature-icon">
+        📊
+        <div class="feature-label">统计</div>
+    </div>
+    <div class="feature-icon">
+        ➕
+        <div class="feature-label">发动态</div>
+    </div>
+    <div class="feature-icon">
+        ⏲️
+        <div class="feature-label">番茄钟</div>
+    </div>
+    <div class="feature-icon">
+        📝
+        <div class="feature-label">时间表</div>
+    </div>
+</div>
+
+<style>
+    .feature-icons {
+        display: flex; 
+        justify-content: space-around; 
+        margin: 18px 0 0 0;
+        position: sticky; 
+        top: 48px; 
+        z-index: 20; 
+        background: #fff; 
+        box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+    }
+    .feature-icon { 
+        width: 56px; 
+        height: 56px; 
+        border-radius: 50%; 
+        background: #f0f0f0; 
+        display: flex; 
+        align-items: center; 
+        justify-content: center; 
+        font-size: 24px; 
+        flex-direction: column; 
+    }
+    .feature-label { 
+        font-size: 12px; 
+        margin-top: 4px; 
+        color: #666; 
+    }
+    
+    @media (max-width: 500px) {
+        .feature-icons { top: 44px; }
+    }
+</style> 

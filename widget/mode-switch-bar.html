@@ -1,0 +1,47 @@
+<!-- 模式切换 -->
+<div class="mode-switch-bar">
+    <span>切换：</span>
+    <button class="mode-btn active" id="textModeBtn">文字模式</button>
+    <button class="mode-btn" id="imgModeBtn">图片模式</button>
+</div>
+
+<style>
+    .mode-switch-bar {
+        display: flex; 
+        justify-content: center; 
+        align-items: center; 
+        padding: 8px 12px;
+        position: sticky; 
+        top: 112px; 
+        z-index: 19; 
+        background: #fff; 
+        box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+        margin-top: 0;
+    }
+    .mode-btn { 
+        background: #eee; 
+        border: none; 
+        border-radius: 16px; 
+        padding: 6px 16px; 
+        margin-left: 8px; 
+        cursor: pointer; 
+    }
+    .mode-btn.active { 
+        background: #4a90e2; 
+        color: #fff; 
+    }
+    
+    @media (max-width: 500px) {
+        .mode-switch-bar { top: 108px; }
+    }
+</style>
+
+<script>
+    // 这个脚本会在主文件中定义，这里提供模板
+    // function switchMode(contentId, mode) {
+    //     document.querySelector(`#${contentId} .mode-btn.active`).classList.remove('active');
+    //     document.querySelectorAll(`#${contentId} .mode-btn`)[mode].classList.add('active');
+    //     document.getElementById(`${contentId}TextFeed`).style.display = mode === 0 ? '' : 'none';
+    //     document.getElementById(`${contentId}ImgFeed`).style.display = mode === 1 ? '' : 'none';
+    // }
+</script> 

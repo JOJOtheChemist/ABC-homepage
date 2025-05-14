@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>时间管理社群App新布局</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; background: #f7f7f7; }
+        .container { max-width: 430px; margin: 0 auto; background: #fff; min-height: 100vh; }
+        .theme-tabs { display: flex; overflow-x: auto; background: #fff; border-bottom: 1px solid #eee; }
+        .theme-tab { flex: 0 0 auto; padding: 12px 18px; font-weight: bold; color: #555; cursor: pointer; }
+        .theme-tab.active { color: #fff; background: #4a90e2; border-radius: 20px; }
+        .carousel { margin: 10px 0; padding: 0 10px; position: relative; height: 56px; }
+        .carousel-slide {
+            background: #e0f0ff; border-radius: 10px; padding: 18px;
+            text-align: center; font-weight: bold; position: absolute; left: 0; right: 0; top: 0;
+            opacity: 0; transition: opacity 0.5s;
+        }
+        .carousel-slide.active { opacity: 1; z-index: 1; }
+        .feature-icons {
+            display: flex; justify-content: space-around; margin: 18px 0 0 0;
+            position: sticky; top: 48px; z-index: 20; background: #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+        }
+        .feature-icon { width: 56px; height: 56px; border-radius: 50%; background: #f0f0f0; display: flex; align-items: center; justify-content: center; font-size: 24px; flex-direction: column; }
+        .feature-label { font-size: 12px; margin-top: 4px; color: #666; }
+        .video-row { display: flex; align-items: center; overflow-x: auto; padding: 10px 0; }
+        .video-card { min-width: 120px; height: 160px; background: #eee; border-radius: 8px; margin-right: 10px; display: flex; align-items: flex-end; justify-content: center; position: relative; }
+        .video-title { font-size: 13px; color: #333; background: rgba(255,255,255,0.8); width: 100%; text-align: center; border-radius: 0 0 8px 8px; }
+        .more-arrow { font-size: 20px; color: #aaa; margin-left: 8px; cursor: pointer; }
+        .mode-switch-bar {
+            display: flex; justify-content: center; align-items: center; padding: 8px 12px;
+            position: sticky; top: 112px; z-index: 19; background: #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+            margin-top: 0;
+        }
+        .mode-btn { background: #eee; border: none; border-radius: 16px; padding: 6px 16px; margin-left: 8px; cursor: pointer; }
+        .mode-btn.active { background: #4a90e2; color: #fff; }
+        .feed { padding: 0 10px; }
+        .feed-list { display: flex; flex-direction: column; gap: 16px; }
+        .feed-card { background: #fafafa; border-radius: 10px; padding: 18px 14px 12px 14px; box-shadow: 0 2px 8px rgba(0,0,0,0.03); margin-bottom: 8px; }
+        .feed-card-title { font-size: 17px; font-weight: bold; color: #222; margin-bottom: 8px; }
+        .feed-card-body { font-size: 15px; color: #444; margin-bottom: 10px; }
+        .feed-card-img { width: 100%; height: 180px; background: #e0e0e0; border-radius: 8px; margin-bottom: 10px; object-fit: cover; }
+        .feed-card-actions { display: flex; align-items: center; gap: 24px; margin-top: 6px; color: #888; font-size: 18px; }
+        .feed-card-action { display: flex; align-items: center; gap: 4px; cursor: pointer; font-size: 16px; }
+        .feed-card-action span { font-size: 15px; color: #666; }
+        .recommend-section { margin: 24px 0; padding: 0 10px; }
+        .recommend-title { font-weight: bold; margin-bottom: 10px; }
+        .recommend-list { display: flex; flex-direction: column; gap: 12px; }
+        .recommend-card { display: flex; align-items: center; background: #f5faff; border-radius: 8px; padding: 10px; }
+        .recommend-avatar { width: 40px; height: 40px; border-radius: 50%; background: #ddd; margin-right: 10px; }
+        .recommend-info { flex: 1; }
+        .recommend-btn { background: #4a90e2; color: #fff; border: none; border-radius: 16px; padding: 6px 16px; cursor: pointer; }
+        .feed-card-imgmode { display: flex; gap: 8px; }
+        .feed-img-col { flex: 1; display: flex; flex-direction: column; gap: 16px; }
+        .feed-img-card { display: flex; flex-direction: column; align-items: center; margin-bottom: 0; }
+        .feed-img { width: 100%; background: #e0e0e0; border-radius: 8px; }
+        .img-3-4 { aspect-ratio: 3/4; }
+        .img-1-1 { aspect-ratio: 1/1; }
+        .img-4-3 { aspect-ratio: 4/3; }
+        .feed-img-title { font-size: 14px; color: #222; margin-top: 6px; font-weight: bold; width: 100%; text-align: left; }
+        .feed-img-user { font-size: 12px; color: #888; width: 100%; text-align: left; margin-bottom: 2px; }
+        @media (max-width: 500px) {
+            .feature-icons { top: 44px; }
+            .mode-switch-bar { top: 108px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 主题切换 -->
+        <div class="theme-tabs" id="themeTabs">
+            <div class="theme-tab active" data-index="0">推荐</div>
+            <div class="theme-tab" data-index="1">学习方法</div>
+            <div class="theme-tab" data-index="2">情绪健康</div>
+            <div class="theme-tab" data-index="3">兴趣爱好</div>
+            <div class="theme-tab" data-index="4">副业成长</div>
+        </div>
+
+        <!-- 内容区 -->
+        <div id="mainContent">
+            <!-- 推荐内容区 -->
+            <div id="recommendContent">
+                <!-- 轮播图/话题横幅 -->
+                <div class="carousel" id="carousel-recommend">
+                    <div class="carousel-slide active">督学直播：230人正在早起学习</div>
+                    <div class="carousel-slide">400人在讨论学习方法</div>
+                    <div class="carousel-slide">500人在关注情绪健康</div>
+                    <div class="carousel-slide">100人在发展副业</div>
+                </div>
+                <!-- 四大功能按钮 -->
+                <div class="feature-icons">
+                    <div class="feature-icon">
+                        📊
+                        <div class="feature-label">统计</div>
+                    </div>
+                    <div class="feature-icon">
+                        ➕
+                        <div class="feature-label">发动态</div>
+                    </div>
+                    <div class="feature-icon">
+                        ⏲️
+                        <div class="feature-label">番茄钟</div>
+                    </div>
+                    <div class="feature-icon">
+                        📝
+                        <div class="feature-label">时间表</div>
+                    </div>
+                </div>
+                <!-- 模式切换 -->
+                <div class="mode-switch-bar">
+                    <span>切换：</span>
+                    <button class="mode-btn active" id="textModeBtn">文字模式</button>
+                    <button class="mode-btn" id="imgModeBtn">图片模式</button>
+                </div>
+                <!-- feed流 -->
+                <div class="feed-switch-wrapper" id="feedSwitchWrapper-recommend">
+                    <div class="feed" id="textFeed" style="flex: 0 0 100%; transition: transform 0.3s;">
+                        <div class="feed-list">
+                            <div class="feed-card">
+                                <div class="feed-card-title">推文标题示例1</div>
+                                <div class="feed-card-body">这里是推文的正文内容摘要，可以展示多行内容，长度适中更美观。</div>
+                                <div class="feed-card-img"></div>
+                                <div class="feed-card-actions">
+                                    <div class="feed-card-action">❤️ <span>443</span></div>
+                                    <div class="feed-card-action">💬 <span>12</span></div>
+                                    <div class="feed-card-action">🔖 <span>45</span></div>
+                                    <div class="feed-card-action">🔄</div>
+                                </div>
+                            </div>
+                            <div class="feed-card">
+                                <div class="feed-card-title">推文标题示例2</div>
+                                <div class="feed-card-body">这里是另一条推文的正文内容摘要，支持换行和更多内容展示。</div>
+                                <div class="feed-card-img"></div>
+                                <div class="feed-card-actions">
+                                    <div class="feed-card-action">❤️ <span>321</span></div>
+                                    <div class="feed-card-action">💬 <span>8</span></div>
+                                    <div class="feed-card-action">🔖 <span>22</span></div>
+                                    <div class="feed-card-action">🔄</div>
+                            </div>
+                        </div>
+                        <div class="feed-card">
+                            <div class="feed-card-title">推文标题示例3</div>
+                            <div class="feed-card-body">第三条推文内容，丰富你的信息流体验。</div>
+                            <div class="feed-card-img"></div>
+                            <div class="feed-card-actions">
+                                <div class="feed-card-action">❤️ <span>210</span></div>
+                                <div class="feed-card-action">💬 <span>5</span></div>
+                                <div class="feed-card-action">🔖 <span>12</span></div>
+                                <div class="feed-card-action">🔄</div>
+                        </div>
+                    </div>
+                    <div class="recommend-section" style="margin: 0 0 16px 0; padding: 0;">
+                        <div class="recommend-title">推荐关注</div>
+                        <div class="recommend-list">
+                            <div class="recommend-card">
+                                <div class="recommend-avatar"></div>
+                                <div class="recommend-info">
+                                    <div style="font-weight:bold;">用户ID1</div>
+                                    <div style="font-size:13px; color:#666;">时间管理达人，专注高效学习</div>
+                                </div>
+                                <button class="recommend-btn">关注</button>
+                            </div>
+                            <div class="recommend-card">
+                                <div class="recommend-avatar"></div>
+                                <div class="recommend-info">
+                                    <div style="font-weight:bold;">用户ID2</div>
+                                    <div style="font-size:13px; color:#666;">自律生活记录者</div>
+                                </div>
+                                <button class="recommend-btn">关注</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="feed-card">
+                        <div class="feed-card-title">推文标题示例4</div>
+                        <div class="feed-card-body">第四条推文内容，继续丰富内容流。</div>
+                        <div class="feed-card-img"></div>
+                        <div class="feed-card-actions">
+                            <div class="feed-card-action">❤️ <span>188</span></div>
+                            <div class="feed-card-action">💬 <span>3</span></div>
+                            <div class="feed-card-action">🔖 <span>9</span></div>
+                            <div class="feed-card-action">🔄</div>
+                        </div>
+                    </div>
+                    <div class="feed-card">
+                        <div class="feed-card-title">推文标题示例5</div>
+                        <div class="feed-card-body">第五条推文内容，信息流更长更有趣。</div>
+                        <div class="feed-card-img"></div>
+                        <div class="feed-card-actions">
+                            <div class="feed-card-action">❤️ <span>99</span></div>
+                            <div class="feed-card-action">💬 <span>2</span></div>
+                            <div class="feed-card-action">🔖 <span>5</span></div>
+                            <div class="feed-card-action">🔄</div>
+                        </div>
+                    </div>
+                    <div class="feed-card">
+                        <div class="feed-card-title">推文标题示例6</div>
+                        <div class="feed-card-body">第六条推文内容，展示更多样化的内容。</div>
+                        <div class="feed-card-img"></div>
+                        <div class="feed-card-actions">
+                            <div class="feed-card-action">❤️ <span>56</span></div>
+                            <div class="feed-card-action">💬 <span>1</span></div>
+                            <div class="feed-card-action">🔖 <span>2</span></div>
+                            <div class="feed-card-action">🔄</div>
+                        </div>
+                    </div>
+                </div>
+                <!-- 横向视频卡片 -->
+                <div class="video-row-container" style="position: relative; margin: 16px 0; padding: 0 10px;">
+                    <div class="video-arrow left" id="videoRowArrowLeft" style="display:none; position: absolute; left: 0; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.8); height: 40px; width: 30px; border-radius: 0 20px 20px 0; z-index: 2; align-items:center; justify-content:center;"><span style="font-size:18px;">◀</span></div>
+                    <div class="video-row" id="videoRow" style="flex:1; overflow-x: auto; scroll-behavior: smooth; padding: 5px 0; display: flex;">
+                        <div class="video-card"><div class="video-title">视频1</div></div>
+                        <div class="video-card"><div class="video-title">视频2</div></div>
+                        <div class="video-card"><div class="video-title">视频3</div></div>
+                        <div class="video-card"><div class="video-title">视频4</div></div>
+                        <div class="video-card"><div class="video-title">视频5</div></div>
+                        <div class="video-card"><div class="video-title">视频6</div></div>
+                    </div>
+                    <div class="video-arrow right" id="videoRowArrow" style="position: absolute; right: 0; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.8); height: 40px; width: 30px; border-radius: 20px 0 0 20px; z-index: 2; display:flex; align-items:center; justify-content:center;"><span style="font-size:18px;">▶</span></div>
+                </div>
+            </div>
+            <div class="feed" id="imgFeed" style="flex: 0 0 100%; transition: transform 0.3s; display:none;">
+                <div class="feed-card-imgmode">
+                    <div class="feed-img-col">
+                        <div class="feed-img-card">
+                            <div class="feed-img img-3-4"></div>
+                            <div class="feed-img-title">3:4竖图</div>
+                            <div class="feed-img-user">用户ID_A</div>
+                        </div>
+                        <div class="feed-img-card">
+                            <div class="feed-img img-1-1"></div>
+                            <div class="feed-img-title">1:1方图</div>
+                            <div class="feed-img-user">用户ID_B</div>
+                        </div>
+                        <div class="feed-img-card">
+                            <div class="feed-img img-4-3"></div>
+                            <div class="feed-img-title">4:3横图</div>
+                            <div class="feed-img-user">用户ID_C</div>
+                        </div>
+                    </div>
+                    <div class="feed-img-col">
+                        <div class="feed-img-card">
+                            <div class="feed-img img-1-1"></div>
+                            <div class="feed-img-title">1:1方图</div>
+                            <div class="feed-img-user">用户ID_D</div>
+                        </div>
+                        <div class="feed-img-card">
+                            <div class="feed-img img-3-4"></div>
+                            <div class="feed-img-title">3:4竖图</div>
+                            <div class="feed-img-user">用户ID_E</div>
+                        </div>
+                        <div class="feed-img-card">
+                            <div class="feed-img img-4-3"></div>
+                            <div class="feed-img-title">4:3横图</div>
+                            <div class="feed-img-user">用户ID_F</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- 学习方法内容区 -->
+        <div id="studyContent" style="display:none;">
+            <!-- 轮播图/话题横幅 -->
+            <div class="carousel" id="carousel-study">
+                <div class="carousel-slide active">学习方法专属轮播1</div>
+                <div class="carousel-slide">学习方法专属轮播2</div>
+            </div>
+            <!-- 四大功能按钮 -->
+            <div class="feature-icons">
+                <div class="feature-icon">
+                    📊
+                    <div class="feature-label">统计</div>
+                </div>
+                <div class="feature-icon">
+                    ➕
+                    <div class="feature-label">发动态</div>
+                </div>
+                <div class="feature-icon">
+                    ⏲️
+                    <div class="feature-label">番茄钟</div>
+                </div>
+                <div class="feature-icon">
+                    📝
+                    <div class="feature-label">时间表</div>
+                </div>
+            </div>
+            <!-- 模式切换 -->
+            <div class="mode-switch-bar">
+                <span>切换：</span>
+                <button class="mode-btn active" id="studyTextModeBtn">文字模式</button>
+                <button class="mode-btn" id="studyImgModeBtn">图片模式</button>
+            </div>
+            <!-- feed流 -->
+            <div class="feed-switch-wrapper" id="feedSwitchWrapper-study">
+                <div class="feed" id="studyTextFeed" style="flex: 0 0 100%; transition: transform 0.3s;">
+                    <div class="feed-list">
+                        <div class="feed-card"><div class="feed-card-title">学习方法-文字模式内容1</div></div>
+                    </div>
+                </div>
+                <div class="feed" id="studyImgFeed" style="flex: 0 0 100%; transition: transform 0.3s; display:none;">
+                    <div class="feed-card-imgmode">
+                        <div class="feed-img-col">
+                            <div class="feed-img-card">
+                                <div class="feed-img img-3-4"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- 横向视频卡片 -->
+            <div class="video-row-container" style="position: relative; margin: 16px 0; padding: 0 10px;">
+                <div class="video-arrow left" id="studyVideoRowArrowLeft" style="display:none; position: absolute; left: 0; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.8); height: 40px; width: 30px; border-radius: 0 20px 20px 0; z-index: 2; align-items:center; justify-content:center;"><span style="font-size:18px;">◀</span></div>
+                <div class="video-row" id="studyVideoRow" style="flex:1; overflow-x: auto; scroll-behavior: smooth; padding: 5px 0; display: flex;">
+                    <div class="video-card"><div class="video-title">学习视频1</div></div>
+                    <div class="video-card"><div class="video-title">学习视频2</div></div>
+                    <div class="video-card"><div class="video-title">学习视频3</div></div>
+                    <div class="video-card"><div class="video-title">学习视频4</div></div>
+                    <div class="video-card"><div class="video-title">学习视频5</div></div>
+                    <div class="video-card"><div class="video-title">学习视频6</div></div>
+                </div>
+                <div class="video-arrow right" id="studyVideoRowArrow" style="position: absolute; right: 0; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.8); height: 40px; width: 30px; border-radius: 20px 0 0 20px; z-index: 2; display:flex; align-items:center; justify-content:center;"><span style="font-size:18px;">▶</span></div>
+            </div>
+        </div>
+        <!-- 情绪健康内容区 -->
+        <div id="emotionContent" style="display:none;">
+            <div class="carousel" id="carousel-emotion">
+                <div class="carousel-slide active">情绪健康专属轮播1</div>
+                <div class="carousel-slide">情绪健康专属轮播2</div>
+            </div>
+            <div class="feature-icons">
+                <div class="feature-icon">
+                    📊
+                    <div class="feature-label">统计</div>
+                </div>
+                <div class="feature-icon">
+                    ➕
+                    <div class="feature-label">发动态</div>
+                </div>
+                <div class="feature-icon">
+                    ⏲️
+                    <div class="feature-label">番茄钟</div>
+                </div>
+                <div class="feature-icon">
+                    📝
+                    <div class="feature-label">时间表</div>
+                </div>
+            </div>
+            <div class="mode-switch-bar">
+                <span>切换：</span>
+                <button class="mode-btn active" id="emotionTextModeBtn">文字模式</button>
+                <button class="mode-btn" id="emotionImgModeBtn">图片模式</button>
+            </div>
+            <div class="feed-switch-wrapper" id="feedSwitchWrapper-emotion">
+                <div class="feed" id="emotionTextFeed" style="flex: 0 0 100%; transition: transform 0.3s;">
+                    <div class="feed-list">
+                        <div class="feed-card"><div class="feed-card-title">情绪健康-文字模式内容1</div></div>
+                    </div>
+                </div>
+                <div class="feed" id="emotionImgFeed" style="flex: 0 0 100%; transition: transform 0.3s; display:none;">
+                    <div class="feed-card-imgmode">
+                        <div class="feed-img-col">
+                            <div class="feed-img-card">
+                                <div class="feed-img img-3-4"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- 横向视频卡片 -->
+            <div class="video-row-container" style="position: relative; margin: 16px 0; padding: 0 10px;">
+                <div class="video-arrow left" id="emotionVideoRowArrowLeft" style="display:none; position: absolute; left: 0; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.8); height: 40px; width: 30px; border-radius: 0 20px 20px 0; z-index: 2; align-items:center; justify-content:center;"><span style="font-size:18px;">◀</span></div>
+                <div class="video-row" id="emotionVideoRow" style="flex:1; overflow-x: auto; scroll-behavior: smooth; padding: 5px 0; display: flex;">
+                    <div class="video-card"><div class="video-title">情绪视频1</div></div>
+                    <div class="video-card"><div class="video-title">情绪视频2</div></div>
+                    <div class="video-card"><div class="video-title">情绪视频3</div></div>
+                    <div class="video-card"><div class="video-title">情绪视频4</div></div>
+                    <div class="video-card"><div class="video-title">情绪视频5</div></div>
+                    <div class="video-card"><div class="video-title">情绪视频6</div></div>
+                </div>
+                <div class="video-arrow right" id="emotionVideoRowArrow" style="position: absolute; right: 0; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.8); height: 40px; width: 30px; border-radius: 20px 0 0 20px; z-index: 2; display:flex; align-items:center; justify-content:center;"><span style="font-size:18px;">▶</span></div>
+            </div>
+        </div>
+        <!-- 兴趣爱好内容区 -->
+        <div id="hobbyContent" style="display:none;">
+            <div class="carousel" id="carousel-hobby">
+                <div class="carousel-slide active">兴趣爱好专属轮播1</div>
+                <div class="carousel-slide">兴趣爱好专属轮播2</div>
+            </div>
+            <div class="feature-icons">
+                <div class="feature-icon">
+                    📊
+                    <div class="feature-label">统计</div>
+                </div>
+                <div class="feature-icon">
+                    ➕
+                    <div class="feature-label">发动态</div>
+                </div>
+                <div class="feature-icon">
+                    ⏲️
+                    <div class="feature-label">番茄钟</div>
+                </div>
+                <div class="feature-icon">
+                    📝
+                    <div class="feature-label">时间表</div>
+                </div>
+            </div>
+            <div class="mode-switch-bar">
+                <span>切换：</span>
+                <button class="mode-btn active" id="hobbyTextModeBtn">文字模式</button>
+                <button class="mode-btn" id="hobbyImgModeBtn">图片模式</button>
+            </div>
+            <div class="feed-switch-wrapper" id="feedSwitchWrapper-hobby">
+                <div class="feed" id="hobbyTextFeed" style="flex: 0 0 100%; transition: transform 0.3s;">
+                    <div class="feed-list">
+                        <div class="feed-card"><div class="feed-card-title">兴趣爱好-文字模式内容1</div></div>
+                    </div>
+                </div>
+                <div class="feed" id="hobbyImgFeed" style="flex: 0 0 100%; transition: transform 0.3s; display:none;">
+                    <div class="feed-card-imgmode">
+                        <div class="feed-img-col">
+                            <div class="feed-img-card">
+                                <div class="feed-img img-3-4"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- 横向视频卡片 -->
+            <div class="video-row-container" style="position: relative; margin: 16px 0; padding: 0 10px;">
+                <div class="video-arrow left" id="hobbyVideoRowArrowLeft" style="display:none; position: absolute; left: 0; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.8); height: 40px; width: 30px; border-radius: 0 20px 20px 0; z-index: 2; align-items:center; justify-content:center;"><span style="font-size:18px;">◀</span></div>
+                <div class="video-row" id="hobbyVideoRow" style="flex:1; overflow-x: auto; scroll-behavior: smooth; padding: 5px 0; display: flex;">
+                    <div class="video-card"><div class="video-title">兴趣视频1</div></div>
+                    <div class="video-card"><div class="video-title">兴趣视频2</div></div>
+                    <div class="video-card"><div class="video-title">兴趣视频3</div></div>
+                    <div class="video-card"><div class="video-title">兴趣视频4</div></div>
+                    <div class="video-card"><div class="video-title">兴趣视频5</div></div>
+                    <div class="video-card"><div class="video-title">兴趣视频6</div></div>
+                </div>
+                <div class="video-arrow right" id="hobbyVideoRowArrow" style="position: absolute; right: 0; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.8); height: 40px; width: 30px; border-radius: 20px 0 0 20px; z-index: 2; display:flex; align-items:center; justify-content:center;"><span style="font-size:18px;">▶</span></div>
+            </div>
+        </div>
+        <!-- 副业成长内容区 -->
+        <div id="sideContent" style="display:none;">
+            <div class="carousel" id="carousel-side">
+                <div class="carousel-slide active">副业成长专属轮播1</div>
+                <div class="carousel-slide">副业成长专属轮播2</div>
+            </div>
+            <div class="feature-icons">
+                <div class="feature-icon">
+                    📊
+                    <div class="feature-label">统计</div>
+                </div>
+                <div class="feature-icon">
+                    ➕
+                    <div class="feature-label">发动态</div>
+                </div>
+                <div class="feature-icon">
+                    ⏲️
+                    <div class="feature-label">番茄钟</div>
+                </div>
+                <div class="feature-icon">
+                    📝
+                    <div class="feature-label">时间表</div>
+                </div>
+            </div>
+            <div class="mode-switch-bar">
+                <span>切换：</span>
+                <button class="mode-btn active" id="sideTextModeBtn">文字模式</button>
+                <button class="mode-btn" id="sideImgModeBtn">图片模式</button>
+            </div>
+            <div class="feed-switch-wrapper" id="feedSwitchWrapper-side">
+                <div class="feed" id="sideTextFeed" style="flex: 0 0 100%; transition: transform 0.3s;">
+                    <div class="feed-list">
+                        <div class="feed-card"><div class="feed-card-title">副业成长-文字模式内容1</div></div>
+                    </div>
+                </div>
+                <div class="feed" id="sideImgFeed" style="flex: 0 0 100%; transition: transform 0.3s; display:none;">
+                    <div class="feed-card-imgmode">
+                        <div class="feed-img-col">
+                            <div class="feed-img-card">
+                                <div class="feed-img img-3-4"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- 横向视频卡片 -->
+            <div class="video-row-container" style="position: relative; margin: 16px 0; padding: 0 10px;">
+                <div class="video-arrow left" id="sideVideoRowArrowLeft" style="display:none; position: absolute; left: 0; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.8); height: 40px; width: 30px; border-radius: 0 20px 20px 0; z-index: 2; align-items:center; justify-content:center;"><span style="font-size:18px;">◀</span></div>
+                <div class="video-row" id="sideVideoRow" style="flex:1; overflow-x: auto; scroll-behavior: smooth; padding: 5px 0; display: flex;">
+                    <div class="video-card"><div class="video-title">副业视频1</div></div>
+                    <div class="video-card"><div class="video-title">副业视频2</div></div>
+                    <div class="video-card"><div class="video-title">副业视频3</div></div>
+                    <div class="video-card"><div class="video-title">副业视频4</div></div>
+                    <div class="video-card"><div class="video-title">副业视频5</div></div>
+                    <div class="video-card"><div class="video-title">副业视频6</div></div>
+                </div>
+                <div class="video-arrow right" id="sideVideoRowArrow" style="position: absolute; right: 0; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.8); height: 40px; width: 30px; border-radius: 20px 0 0 20px; z-index: 2; display:flex; align-items:center; justify-content:center;"><span style="font-size:18px;">▶</span></div>
+            </div>
+        </div>
+    </div>
+    <script>
+        // 轮播图自动切换
+        const slides = document.querySelectorAll('.carousel-slide');
+        let current = 0;
+        setInterval(() => {
+            slides[current].classList.remove('active');
+            current = (current + 1) % slides.length;
+            slides[current].classList.add('active');
+        }, 2500);
+
+        // 推荐区模式切换
+        const textBtnRecommend = document.getElementById('textModeBtn');
+        const imgBtnRecommend = document.getElementById('imgModeBtn');
+        const textFeedRecommend = document.getElementById('textFeed');
+        const imgFeedRecommend = document.getElementById('imgFeed');
+        const feedSwitchWrapperRecommend = document.getElementById('feedSwitchWrapper-recommend');
+        let currentFeedRecommend = 0;
+        function updateFeedViewRecommend() {
+            textBtnRecommend.classList.toggle('active', currentFeedRecommend === 0);
+            imgBtnRecommend.classList.toggle('active', currentFeedRecommend === 1);
+            textFeedRecommend.style.display = '';
+            imgFeedRecommend.style.display = '';
+            textFeedRecommend.style.transform = `translateX(${-currentFeedRecommend * 100}%)`;
+            imgFeedRecommend.style.transform = `translateX(${-currentFeedRecommend * 100}%)`;
+            if(window.videoRowSection) videoRowSection.style.display = currentFeedRecommend === 0 ? '' : 'none';
+        }
+        textBtnRecommend.onclick = function() { currentFeedRecommend = 0; updateFeedViewRecommend(); }
+        imgBtnRecommend.onclick = function() { currentFeedRecommend = 1; updateFeedViewRecommend(); }
+        let feedStartXRecommend = 0, deltaXRecommend = 0;
+        feedSwitchWrapperRecommend.addEventListener('touchstart', function(e) {
+            feedStartXRecommend = e.touches[0].clientX;
+        });
+        feedSwitchWrapperRecommend.addEventListener('touchmove', function(e) {
+            deltaXRecommend = e.touches[0].clientX - feedStartXRecommend;
+        });
+        feedSwitchWrapperRecommend.addEventListener('touchend', function(e) {
+            if(deltaXRecommend < -50 && currentFeedRecommend === 0) { currentFeedRecommend = 1; updateFeedViewRecommend(); }
+            else if(deltaXRecommend > 50 && currentFeedRecommend === 1) { currentFeedRecommend = 0; updateFeedViewRecommend(); }
+            else if(deltaXRecommend < -50 && currentFeedRecommend === 1 && window.currentTheme === 0) {
+                updateThemeTab(1);
+                currentFeedRecommend = 0;
+                updateFeedViewRecommend();
+            }
+            deltaXRecommend = 0;
+        });
+        let isMouseDownRecommend = false, mouseStartXRecommend = 0, mouseDeltaXRecommend = 0;
+        feedSwitchWrapperRecommend.addEventListener('mousedown', function(e) {
+            isMouseDownRecommend = true; mouseStartXRecommend = e.clientX;
+        });
+        feedSwitchWrapperRecommend.addEventListener('mousemove', function(e) {
+            if(isMouseDownRecommend) mouseDeltaXRecommend = e.clientX - mouseStartXRecommend;
+        });
+        feedSwitchWrapperRecommend.addEventListener('mouseup', function(e) {
+            if(isMouseDownRecommend) {
+                if(mouseDeltaXRecommend < -50 && currentFeedRecommend === 0) { currentFeedRecommend = 1; updateFeedViewRecommend(); }
+                else if(mouseDeltaXRecommend > 50 && currentFeedRecommend === 1) { currentFeedRecommend = 0; updateFeedViewRecommend(); }
+                else if(mouseDeltaXRecommend < -50 && currentFeedRecommend === 1 && window.currentTheme === 0) {
+                    updateThemeTab(1);
+                    currentFeedRecommend = 0;
+                    updateFeedViewRecommend();
+                }
+                mouseDeltaXRecommend = 0; isMouseDownRecommend = false;
+            }
+        });
+        updateFeedViewRecommend();
+
+        // 通用视频行滚动逻辑
+        function setupVideoRow(rowId, leftArrowId, rightArrowId) {
+            const row = document.getElementById(rowId);
+            const rightArrow = document.getElementById(rightArrowId);
+            const leftArrow = document.getElementById(leftArrowId);
+            
+            function updateArrows() {
+                if (!row) return;
+                // 左侧是否可滑动
+                leftArrow.style.display = row.scrollLeft > 10 ? 'flex' : 'none';
+                // 右侧是否可滑动
+                rightArrow.style.display = (row.scrollLeft + row.clientWidth < row.scrollWidth - 10) ? 'flex' : 'none';
+            }
+            
+            if(rightArrow && row) {
+                rightArrow.onclick = function() {
+                    const card = row.querySelector('.video-card');
+                    if(card) {
+                        row.scrollLeft += (card.offsetWidth + 10) * 3;
+                        setTimeout(updateArrows, 350);
+                    }
+                }
+            }
+            
+            if(leftArrow && row) {
+                leftArrow.onclick = function() {
+                    const card = row.querySelector('.video-card');
+                    if(card) {
+                        row.scrollLeft -= (card.offsetWidth + 10) * 3;
+                        setTimeout(updateArrows, 350);
+                    }
+                }
+            }
+            
+            if(row) {
+                row.addEventListener('scroll', updateArrows);
+                window.addEventListener('resize', updateArrows);
+                setTimeout(updateArrows, 100);
+                
+                // 拖拽横向滚动支持
+                let isDown = false, startX = 0, scrollLeft = 0;
+                row.addEventListener('mousedown', function(e) {
+                    isDown = true;
+                    row.classList.add('dragging');
+                    startX = e.pageX - row.offsetLeft;
+                    scrollLeft = row.scrollLeft;
+                });
+                row.addEventListener('mouseleave', function() {
+                    isDown = false;
+                    row.classList.remove('dragging');
+                });
+                row.addEventListener('mouseup', function() {
+                    isDown = false;
+                    row.classList.remove('dragging');
+                });
+                row.addEventListener('mousemove', function(e) {
+                    if(!isDown) return;
+                    e.preventDefault();
+                    const x = e.pageX - row.offsetLeft;
+                    const walk = (x - startX) * 1.2; // 拖动速度系数
+                    row.scrollLeft = scrollLeft - walk;
+                });
+            }
+        }
+        
+        // 设置所有视频行
+        setupVideoRow('videoRow', 'videoRowArrowLeft', 'videoRowArrow');
+        setupVideoRow('studyVideoRow', 'studyVideoRowArrowLeft', 'studyVideoRowArrow');
+        setupVideoRow('emotionVideoRow', 'emotionVideoRowArrowLeft', 'emotionVideoRowArrow');
+        setupVideoRow('hobbyVideoRow', 'hobbyVideoRowArrowLeft', 'hobbyVideoRowArrow');
+        setupVideoRow('sideVideoRow', 'sideVideoRowArrowLeft', 'sideVideoRowArrow');
+
+        // 主题切换逻辑
+        const themeTabs = document.getElementById('themeTabs');
+        const themeTabEls = themeTabs.querySelectorAll('.theme-tab');
+        const recommendContent = document.getElementById('recommendContent');
+        const studyContent = document.getElementById('studyContent');
+        const emotionContent = document.getElementById('emotionContent');
+        const hobbyContent = document.getElementById('hobbyContent');
+        const sideContent = document.getElementById('sideContent');
+        let currentTheme = 0;
+        function updateThemeTab(idx) {
+            themeTabEls.forEach((el, i) => el.classList.toggle('active', i === idx));
+            currentTheme = idx;
+            recommendContent.style.display = idx === 0 ? '' : 'none';
+            studyContent.style.display = idx === 1 ? '' : 'none';
+            emotionContent.style.display = idx === 2 ? '' : 'none';
+            hobbyContent.style.display = idx === 3 ? '' : 'none';
+            sideContent.style.display = idx === 4 ? '' : 'none';
+        }
+        themeTabEls.forEach((el, i) => {
+            el.onclick = () => updateThemeTab(i);
+        });
+        // 主题栏滑动切换（touch/mouse拖动）
+        let themeStartX = 0, themeDeltaX = 0;
+        themeTabs.addEventListener('touchstart', function(e) {
+            themeStartX = e.touches[0].clientX;
+        });
+        themeTabs.addEventListener('touchmove', function(e) {
+            themeDeltaX = e.touches[0].clientX - themeStartX;
+        });
+        themeTabs.addEventListener('touchend', function(e) {
+            if(themeDeltaX < -40 && currentTheme < themeTabEls.length-1) {
+                updateThemeTab(currentTheme+1);
+            } else if(themeDeltaX > 40 && currentTheme > 0) {
+                updateThemeTab(currentTheme-1);
+            }
+            themeDeltaX = 0;
+        });
+        // 鼠标拖动支持
+        let themeMouseDown = false, themeMouseStartX = 0, themeMouseDeltaX = 0;
+        themeTabs.addEventListener('mousedown', function(e) {
+            themeMouseDown = true; themeMouseStartX = e.clientX;
+        });
+        themeTabs.addEventListener('mousemove', function(e) {
+            if(themeMouseDown) themeMouseDeltaX = e.clientX - themeMouseStartX;
+        });
+        themeTabs.addEventListener('mouseup', function(e) {
+            if(themeMouseDown) {
+                if(themeMouseDeltaX < -40 && currentTheme < themeTabEls.length-1) {
+                    updateThemeTab(currentTheme+1);
+                } else if(themeMouseDeltaX > 40 && currentTheme > 0) {
+                    updateThemeTab(currentTheme-1);
+                }
+                themeMouseDeltaX = 0; themeMouseDown = false;
+            }
+        });
+
+        // 文字/图片模式切换函数
+        function switchRecommendMode(mode) {
+            document.querySelector('#recommendContent .mode-btn.active').classList.remove('active');
+            document.querySelectorAll('#recommendContent .mode-btn')[mode].classList.add('active');
+            document.getElementById('textFeed').style.display = mode === 0 ? '' : 'none';
+            document.getElementById('imgFeed').style.display = mode === 1 ? '' : 'none';
+        }
+
+        function switchStudyMode(mode) {
+            document.querySelector('#studyContent .mode-btn.active').classList.remove('active');
+            document.querySelectorAll('#studyContent .mode-btn')[mode].classList.add('active');
+            document.getElementById('studyTextFeed').style.display = mode === 0 ? '' : 'none';
+            document.getElementById('studyImgFeed').style.display = mode === 1 ? '' : 'none';
+        }
+        function switchEmotionMode(mode) {
+            document.querySelector('#emotionContent .mode-btn.active').classList.remove('active');
+            document.querySelectorAll('#emotionContent .mode-btn')[mode].classList.add('active');
+            document.getElementById('emotionTextFeed').style.display = mode === 0 ? '' : 'none';
+            document.getElementById('emotionImgFeed').style.display = mode === 1 ? '' : 'none';
+        }
+        function switchHobbyMode(mode) {
+            document.querySelector('#hobbyContent .mode-btn.active').classList.remove('active');
+            document.querySelectorAll('#hobbyContent .mode-btn')[mode].classList.add('active');
+            document.getElementById('hobbyTextFeed').style.display = mode === 0 ? '' : 'none';
+            document.getElementById('hobbyImgFeed').style.display = mode === 1 ? '' : 'none';
+        }
+        function switchSideMode(mode) {
+            document.querySelector('#sideContent .mode-btn.active').classList.remove('active');
+            document.querySelectorAll('#sideContent .mode-btn')[mode].classList.add('active');
+            document.getElementById('sideTextFeed').style.display = mode === 0 ? '' : 'none';
+            document.getElementById('sideImgFeed').style.display = mode === 1 ? '' : 'none';
+        }
+
+        // 添加模式切换按钮事件
+        document.getElementById('textModeBtn').addEventListener('click', () => switchRecommendMode(0));
+        document.getElementById('imgModeBtn').addEventListener('click', () => switchRecommendMode(1));
+        document.getElementById('studyTextModeBtn').addEventListener('click', () => switchStudyMode(0));
+        document.getElementById('studyImgModeBtn').addEventListener('click', () => switchStudyMode(1));
+        document.getElementById('emotionTextModeBtn').addEventListener('click', () => switchEmotionMode(0));
+        document.getElementById('emotionImgModeBtn').addEventListener('click', () => switchEmotionMode(1));
+        document.getElementById('hobbyTextModeBtn').addEventListener('click', () => switchHobbyMode(0));
+        document.getElementById('hobbyImgModeBtn').addEventListener('click', () => switchHobbyMode(1));
+        document.getElementById('sideTextModeBtn').addEventListener('click', () => switchSideMode(0));
+        document.getElementById('sideImgModeBtn').addEventListener('click', () => switchSideMode(1));
+
+        // 通用模式滑动切换逻辑
+        function addFeedSwitchSwipe(wrapperId, textFeedId, imgFeedId, modeSwitchFn, themeIdx) {
+            const wrapper = document.getElementById(wrapperId);
+            if (!wrapper) return;
+            let mode = 0; // 0:文字 1:图片
+            let startX = 0, deltaX = 0;
+            wrapper.addEventListener('touchstart', function(e) {
+                startX = e.touches[0].clientX;
+            });
+            wrapper.addEventListener('touchmove', function(e) {
+                deltaX = e.touches[0].clientX - startX;
+            });
+            wrapper.addEventListener('touchend', function(e) {
+                if(deltaX < -50 && mode === 0) { mode = 1; modeSwitchFn(1); }
+                else if(deltaX > 50 && mode === 1) { mode = 0; modeSwitchFn(0); }
+                // 图片模式下继续右滑，切换到下一个主题
+                else if(deltaX < -50 && mode === 1 && currentTheme === themeIdx && currentTheme < 4) {
+                    updateThemeTab(currentTheme+1);
+                    mode = 0; modeSwitchFn(0);
+                }
+                // 文字模式下继续左滑，切换到上一个主题
+                else if(deltaX > 50 && mode === 0 && currentTheme === themeIdx && currentTheme > 0) {
+                    updateThemeTab(currentTheme-1);
+                    mode = 0; modeSwitchFn(0);
+                }
+                deltaX = 0;
+            });
+            // 鼠标拖动支持
+            let isDown = false, mouseStartX = 0, mouseDeltaX = 0;
+            wrapper.addEventListener('mousedown', function(e) {
+                isDown = true; mouseStartX = e.clientX;
+            });
+            wrapper.addEventListener('mousemove', function(e) {
+                if(isDown) mouseDeltaX = e.clientX - mouseStartX;
+            });
+            wrapper.addEventListener('mouseup', function(e) {
+                if(isDown) {
+                    if(mouseDeltaX < -50 && mode === 0) { mode = 1; modeSwitchFn(1); }
+                    else if(mouseDeltaX > 50 && mode === 1) { mode = 0; modeSwitchFn(0); }
+                    else if(mouseDeltaX < -50 && mode === 1 && currentTheme === themeIdx && currentTheme < 4) {
+                        updateThemeTab(currentTheme+1);
+                        mode = 0; modeSwitchFn(0);
+                    }
+                    else if(mouseDeltaX > 50 && mode === 0 && currentTheme === themeIdx && currentTheme > 0) {
+                        updateThemeTab(currentTheme-1);
+                        mode = 0; modeSwitchFn(0);
+                    }
+                    mouseDeltaX = 0; isDown = false;
+                }
+            });
+        }
+        // 挂载到各主题内容区
+        addFeedSwitchSwipe('recommendContent', 'textFeed', 'imgFeed', switchRecommendMode, 0);
+        addFeedSwitchSwipe('studyContent', 'studyTextFeed', 'studyImgFeed', switchStudyMode, 1);
+        addFeedSwitchSwipe('emotionContent', 'emotionTextFeed', 'emotionImgFeed', switchEmotionMode, 2);
+        addFeedSwitchSwipe('hobbyContent', 'hobbyTextFeed', 'hobbyImgFeed', switchHobbyMode, 3);
+        addFeedSwitchSwipe('sideContent', 'sideTextFeed', 'sideImgFeed', switchSideMode, 4);
+    </script>
+</body>
+</html> 
